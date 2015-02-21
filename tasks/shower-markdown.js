@@ -12,8 +12,10 @@ module.exports = function(grunt) {
 	var path = require('path');
 	var marked = require('marked');
 	var _ = grunt.util._;
+	var destFolder;
 
 	grunt.registerMultiTask('shower', 'Generates Shower presentations from Markdown source', function() {
+
 		var target = this.target;
 		var options = this.data;
 
@@ -22,6 +24,9 @@ module.exports = function(grunt) {
 		var slides = src.split('!SLIDE');
 		var caption = marked(slides.shift());  // Caption is a text above first !SLIDE
 		var title = options.title;
+		var pathTarget;
+
+		destFolder = options.destFolder  + "/" || "./";
 
 		if (!options.title) {
 			// By default title is a first line of caption, with striped tags
@@ -79,10 +84,12 @@ module.exports = function(grunt) {
 		var template = fs.readFileSync(templateFile, 'utf8');
 		var html = grunt.template.process(template, {data: context});
 
-		var dest = options.dest ? options.dest : target + '.html';
-		grunt.file.write(dest, html);
 
-		grunt.log.writeln("File '" + dest + "' created.");
+		var dest = options.dest ? options.dest : target + '.html';
+		pathTarget = destFolder + dest;
+		grunt.file.write(pathTarget, html);
+
+		grunt.log.writeln("File '" + pathTarget + "' created.");
 	});
 
 
@@ -98,16 +105,21 @@ module.exports = function(grunt) {
 	/**
 	 * Returns list of files with fingerprints
 	 */
-	function assets(files) {
+	function assets(files)  {
+
+		var pathFile;
+
 		if (!files) return [];
 
 		if (!_.isArray(files)) files = [files];
 		files.forEach(function(file, fileIdx) {
-			if (!fs.existsSync(file)) {
+			pathFile = destFolder+file;
+			if (!fs.existsSync(pathFile)) {
 				grunt.warn('Asset file "' + file + '" not found.');
 				return;
 			}
-			files[fileIdx] = file + '?' + fs.statSync(file).mtime.getTime();
+
+			files[fileIdx] = file + '?' + fs.statSync(pathFile).mtime.getTime();
 		});
 
 		return files;

@@ -1,3 +1,5 @@
+_(juanma's version)_
+
 # Grunt task that generates Shower presentations from Markdown source
 
 [![Build Status](https://travis-ci.org/sapegin/grunt-shower-markdown.png)](https://travis-ci.org/sapegin/grunt-shower-markdown)
