@@ -102,24 +102,28 @@ module.exports = function(grunt) {
 		return '<img src="' + src + '" alt="' + alt + '" class="' + classes + '">';
 	}
 
+	var crypto = require('crypto');
+
+	function randomValueHex (len) {
+		return crypto.randomBytes(Math.ceil(len/2))
+			.toString('hex') // convert to hexadecimal format
+			.slice(0,len);   // return required number of characters
+	}
+
 	/**
 	 * Returns list of files with fingerprints
 	 */
 	function assets(files)  {
 
-		var pathFile;
+		var pathFile, separator;
 
 		if (!files) return [];
 
 		if (!_.isArray(files)) files = [files];
 		files.forEach(function(file, fileIdx) {
 			pathFile = destFolder+file;
-			if (!fs.existsSync(pathFile)) {
-				grunt.warn('Asset file "' + file + '" not found.');
-				return;
-			}
-
-			files[fileIdx] = file + '?' + fs.statSync(pathFile).mtime.getTime();
+			separator = (pathFile.indexOf("?") != -1) ? '&' : '?';
+			files[fileIdx] = file + separator + randomValueHex(12);
 		});
 
 		return files;
